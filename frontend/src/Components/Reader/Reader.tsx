@@ -30,7 +30,7 @@ export const Reader = () => {
         setSelectedPage(page);
     }
 
-    function toggleCollapse(event: React.MouseEvent<HTMLsectionElement>) {
+    function toggleCollapse(event: React.MouseEvent<HTMLOptionElement>) {
         const content = (event.currentTarget as HTMLElement).nextElementSibling as HTMLElement;
         content.style.display = content.style.display === "block" ? "none" : "block";
     }

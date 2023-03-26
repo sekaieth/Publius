@@ -24,17 +24,19 @@ import {
   $createCollapsibleContainerNode,
   $isCollapsibleContainerNode,
   CollapsibleContainerNode
-} from "../Nodes/XzibitNode/XzibitNode.tsx";
+} from "../../Nodes/CollapsibleNodes/CollapsibleContainerNode";
+
 import {
   $createCollapsibleContentNode,
   $isCollapsibleContentNode,
   CollapsibleContentNode
-} from "../Nodes/XzibitNode/XzibitNode.tsx";
+} from "../../Nodes/CollapsibleNodes/CollapsibleContentNode";
+
 import {
   $createCollapsibleTitleNode,
   $isCollapsibleTitleNode,
   CollapsibleTitleNode
-} from "../Nodes/XzibitNode/XzibitNode.tsx";
+} from "../../Nodes/CollapsibleNodes/CollapsibleTitleNode";
 
 export const INSERT_COLLAPSIBLE_COMMAND = createCommand<void>();
 export const TOGGLE_COLLAPSIBLE_COMMAND = createCommand<NodeKey>();
