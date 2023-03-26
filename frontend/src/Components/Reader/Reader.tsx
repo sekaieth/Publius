@@ -2,62 +2,89 @@ import React, { useState, useEffect } from "react";
 import "./Reader.css";
 import { ethers } from "ethers";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useContractRead, useAccount } from "wagmi";
-import { usePubliusTokenUri } from "../../generated"
-import PubliusLogo from "../../../../Publius-Transparent-White.png";
-import { Publius__factory } from "../../../../contracts/typechain-types";
-import hardhatAddresses from "../../../../contracts/hardhat-contract-info.json"
+import { useAccount, useNetwork } from "wagmi";
+import { usePubliusTokenUri } from "../../Types/WAGMI/generated"
+import PubliusLogo from "../../../Assets/Publius-Transparent-White.png";
+import scrollAddresses from "../../scroll-contract-info.json";
 import { 
     Publication, 
     Section,
     Chapter,
     Page,
-} from '../../types';
+} from '../../Types/types';
 import ReactMarkdown from 'react-markdown';
-
+// Reader component
 export const Reader = () => {
+    // State management
     const [selectedPage, setSelectedPage] = useState<Page>();
     const [publication, setPublication] = useState<Publication>();
 
+    // Hooks for fetching account and network data
     const { address, isDisconnected } = useAccount();
+    const { chain, chains } = useNetwork();
 
-    const { data } = usePubliusTokenUri ({
-        address: `0x${hardhatAddresses.Publius.address.substring(2)}`,
+    // Get Publius contract addresses
+    const scrollPublius = scrollAddresses.Publius.address.substring(2);
+
+    // Fetch publication data using the Publius token URI
+    const { data, isError, error } = usePubliusTokenUri ({
+        address: `0x${scrollPublius}`,
         args: [ethers.BigNumber.from(1)],
     });
 
+    // Handle page click event
     function handlePageClick(page: Page) {
         setSelectedPage(page);
     }
 
+<<<<<<< HEAD
     function toggleCollapse(event: React.MouseEvent<HTMLOptionElement>) {
+=======
+    // Toggle collapsible section
+    function toggleCollapse(event: React.MouseEvent) {
+>>>>>>> dev
         const content = (event.currentTarget as HTMLElement).nextElementSibling as HTMLElement;
         content.style.display = content.style.display === "block" ? "none" : "block";
     }
 
+    // Update publication state when data is fetched
     useEffect(() => {
-        console.log(data);
         if (data) {
-            console.log(data);
             const encodedPublication = data.substring(29);
             const decodedB64 = atob(encodedPublication);
             const json = JSON.parse(decodedB64);
-            console.log(json);
             setPublication(json);
         }
     }, [data]);
 
+    // Render the component
     if(isDisconnected) {
+        // Render ConnectButton and message when wallet is not connected
         return (
             <section className="readerContainer">
                 <ConnectButton />
                 <img src={PubliusLogo}></img>
-                <section className="readerBox">
+                <section className="readerBoxBig">
                     <h1>Please connect your wallet to continue</h1>
                 </section>
             </section>
         )
-    } else return (
+    } 
+    if(isError) {
+        // Render error message when an error occurs
+        return (
+              <section className="readerContainer">
+                <ConnectButton />
+                <img src={PubliusLogo}></img>
+                <section className="readerBoxBig">
+                    <h1>There was an error loading the publication</h1>
+                    {error && error.message}         
+                </section>
+            </section>
+        )
+    }
+    else return (
+      // Render the main reader UI
       <section className="readerContainer">
         <ConnectButton />
         <img src={PubliusLogo}></img>

@@ -5,6 +5,7 @@ import hardhatAddresses from "../hardhat-contract-info.json";
 import devdocs from "../devdocs.json";
 import * as fs from "fs";
 import { Section } from "../interfaces";
+import scrollAddresses from "../scroll-contract-info.json";
 
 type ContractName =
     | 'PubliusImpl'
@@ -21,18 +22,28 @@ interface EncodedData {
     encodedChapters: string;
     encodedPages: string;
 }
+
+// Function to add a new publication
 async function addPublication() {
+    // Get the current network
     const network = await ethers.provider.getNetwork();
     let author: SignerWithAddress;
 
+    // Get the author's signer
     [author] = await ethers.getSigners();
+    
+    // Get the instance of PubliusFactory contract
     const factory =  await ethers.getContractAt(
-        PubliusFactory__factory.abi,
-        hardhatAddresses.PubliusFactory.address,
+        'PubliusFactory',
+        scrollAddresses.PubliusFactory.address,
         author 
     ) as PubliusFactory;
 
+    // Calculate the publication ID
     const publicationId = (await factory.publicationCount()).toNumber() + 1;
+    console.log("Deploying a new publication...ID = ", publicationId)
+
+    // Create a new publication using the factory
     const deployPublication = await factory.createPublication(
         publicationId, 
         author.address, 
@@ -43,92 +54,44 @@ async function addPublication() {
     );
     deployPublication.wait();
 
+    // Wait 5 seconds for the chain to settle
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    // Get the address of the newly created publication
     const publicationAddress = await factory.getPublicationAddress(publicationId);
 
+    // Update the contract addresses
     const contracts: Record<ContractName, Contract> = ({
         PubliusImpl: {
-            network: network.name === 'unknown' ? 'hardhat' : network.name,
-            address: hardhatAddresses.PubliusImpl.address,
+            network: "scroll",
+            address: scrollAddresses.PubliusImpl.address,
         },
         PubliusFactory: {
-            network: network.name === 'unknown' ? 'hardhat' : network.name,
-            address: hardhatAddresses.PubliusFactory.address,
+            network: "scroll",
+            address: scrollAddresses.PubliusFactory.address,
         },
         Publius: {
-            network: network.name === 'unknown' ? 'hardhat' : network.name,
+            network: "scroll",
             address: publicationAddress,
         }
     });
 
     console.log("Deployed a new publication!");
-    // Stringify the Contracts Map and output to the "addresses" file
+
+    // Write the updated contract addresses to the JSON file
     try {
-    fs.writeFileSync(
-        `${network.name === 'unknown' ? 'hardhat' : network.name}-contract-info.json`,
-        JSON.stringify(contracts, null, 2), 
-        'utf-8');
+        fs.writeFileSync(
+            `scroll-contract-info.json`,
+            JSON.stringify(contracts, null, 2), 
+            'utf-8'
+        );
     } catch (err) {
-    console.error(err);
+        console.error(err);
     } 
-    console.info(`Contract info updated in ${network.name === 'unknown' ? 'hardhat' : network.name}-contract-info.json`);
-    console.info("Publication Contract Address: ", await factory.getPublicationAddress(publicationId));
 
-    console.log("Adding content to publication...");
-
-    const publication = await ethers.getContractAt(
-        "Publius",
-        publicationAddress,
-        author
-    ) as Publius;
-
-
-    // Encode devdocs content and send to contract 
-    devdocs.sections.forEach(async(section, sectionIndex) => {
-
-        const encodedSection = ethers.utils.defaultAbiCoder.encode(
-            ["string", "string", "uint256"],
-            [section.sectionName, section.sectionImage, section.sectionId]
-        );
-
-        const encodedChapters = ethers.utils.defaultAbiCoder.encode(
-          [
-              "string[]",
-              "string[]", 
-              "uint256[]",
-          ],
-          [
-            section.chapters.flatMap(chapter => chapter.chapterName),
-            section.chapters.flatMap(chapter => chapter.chapterImage),
-            section.chapters.flatMap(chapter => chapter.chapterId),
-          ]
-        );
-
-        const encodedPages = ethers.utils.defaultAbiCoder.encode(
-            [
-                "string[][]",
-                "string[][]",
-                "uint256[][]"
-            ],
-            [
-                section.chapters.map(chapter => chapter.pages.map(page => page.pageName)),
-                section.chapters.map(chapter => chapter.pages.map(page => page.pageContent)),
-                section.chapters.map(chapter => chapter.pages.map(page => page.pageId)),
-            ]
-        ); 
-
-        const tx = await publication.addSection(
-            encodedSection,
-            encodedChapters,
-            encodedPages
-        );
-        tx.wait();
-    });
-
-    publication.mint(1);
-
-
-
-
+    console.info(`Contract info updated in scroll-contract-info.json`);
+    console.info("Publication Contract Address: ", publicationAddress);
 }
 
+// Execute the addPublication function
 addPublication();

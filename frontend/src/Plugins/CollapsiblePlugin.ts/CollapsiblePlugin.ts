@@ -24,19 +24,31 @@ import {
   $createCollapsibleContainerNode,
   $isCollapsibleContainerNode,
   CollapsibleContainerNode
+<<<<<<<< HEAD:frontend/src/Plugins/CollapsiblePlugin.ts/CollapsiblePlugin.ts
 } from "../../Nodes/CollapsibleNodes/CollapsibleContainerNode";
 
+========
+} from "../../Nodes/XzibitNode/XzibitNode";
+>>>>>>>> dev:frontend/src/Plugins/CollapsiblePlugin.ts/XzibitPlugin.txt
 import {
   $createCollapsibleContentNode,
   $isCollapsibleContentNode,
   CollapsibleContentNode
+<<<<<<<< HEAD:frontend/src/Plugins/CollapsiblePlugin.ts/CollapsiblePlugin.ts
 } from "../../Nodes/CollapsibleNodes/CollapsibleContentNode";
 
+========
+} from "../../Nodes/XzibitNode/XzibitNode";
+>>>>>>>> dev:frontend/src/Plugins/CollapsiblePlugin.ts/XzibitPlugin.txt
 import {
   $createCollapsibleTitleNode,
   $isCollapsibleTitleNode,
   CollapsibleTitleNode
+<<<<<<<< HEAD:frontend/src/Plugins/CollapsiblePlugin.ts/CollapsiblePlugin.ts
 } from "../../Nodes/CollapsibleNodes/CollapsibleTitleNode";
+========
+} from "../../Nodes/XzibitNode/XzibitNode";
+>>>>>>>> dev:frontend/src/Plugins/CollapsiblePlugin.ts/XzibitPlugin.txt
 
 export const INSERT_COLLAPSIBLE_COMMAND = createCommand<void>();
 export const TOGGLE_COLLAPSIBLE_COMMAND = createCommand<NodeKey>();

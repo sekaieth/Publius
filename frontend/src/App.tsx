@@ -5,7 +5,7 @@ import { Editor } from './Components/Editor/Editor';
 import { Reader } from './Components/Reader/Reader';
 // WAGMI
 import { WagmiConfig, createClient, configureChains } from 'wagmi';
-import { hardhat } from 'wagmi/chains';
+import { hardhat, scrollTestnet } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 // RainbowKit
@@ -16,14 +16,20 @@ import { getDefaultWallets,
 import ReactDOM from "react-dom";
 import { root } from "postcss";
 
+  const { VITE_SCROLL_API } = import.meta.env; 
 // Configure the chains and providers for WAGMI
 const { chains, provider } = configureChains(
-  [hardhat],
+  [hardhat, scrollTestnet],
   [
+    // jsonRpcProvider({
+    //   rpc: (chain) => ({
+    //     http: 'http://localhost:8545',
+    //   })
+    // }),
     jsonRpcProvider({
       rpc: (chain) => ({
-        http: 'http://localhost:8545',
-      })
+        http: VITE_SCROLL_API,
+      }),
     })
   ]
 );
